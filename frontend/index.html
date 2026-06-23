@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CivicBrain AI Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+min-height:100vh;
+padding:20px;
+}
+
+.header{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+font-size:28px;
+font-weight:bold;
+}
+
+.container{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+.panel{
+background:#1e293b;
+padding:25px;
+border-radius:15px;
+}
+
+textarea{
+width:100%;
+height:160px;
+padding:15px;
+border-radius:10px;
+border:none;
+font-size:16px;
+margin-top:15px;
+}
+
+button{
+margin-top:15px;
+padding:12px 25px;
+background:#22c55e;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+opacity:.9;
+}
+
+.reportCard{
+
+margin-top:20px;
+padding:20px;
+background:#020f2c;
+border-radius:15px;
+line-height:2;
+}
+
+.stats{
+display:flex;
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+flex:1;
+background:#334155;
+padding:20px;
+border-radius:12px;
+text-align:center;
+}
+
+.card h1{
+font-size:40px;
+margin-bottom:10px;
+}
+
+canvas{
+margin-top:20px;
+background:white;
+padding:10px;
+border-radius:15px;
+}
+
+.loading{
+
+margin-top:15px;
+color:#22c55e;
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+🚀 CivicBrain AI — Smart City Command Dashboard
+</div>
+
+<div class="container">
+
+<div class="panel">
+
+<h2>📍 Report Civic Issue</h2>
+
+<textarea
+id="input"
+placeholder="Describe civic issue..."></textarea>
+
+<button onclick="analyze()">
+Analyze
+</button>
+
+<div class="loading" id="loading"></div>
+
+<div class="reportCard">
+
+<h2>📌 Report</h2>
+
+<br>
+
+<p><b>Category:</b>
+<span id="category">-</span></p>
+
+<p><b>Severity:</b>
+<span id="severity">-</span></p>
+
+<p><b>Department:</b>
+<span id="department">-</span></p>
+
+<p><b>Score:</b>
+<span id="score">-</span></p>
+
+<p><b>Action:</b>
+<span id="action">-</span></p>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>📊 City Analytics</h2>
+
+<div class="stats">
+
+<div class="card">
+<h1 id="totalCount">0</h1>
+<p>Total</p>
+</div>
+
+<div class="card">
+<h1 id="highCount">0</h1>
+<p>High</p>
+</div>
+
+<div class="card">
+<h1 id="mediumCount">0</h1>
+<p>Medium</p>
+</div>
+
+</div>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+</div>
+
+<script>
+
+let total=0;
+let high=0;
+let medium=0;
+
+let chart;
+
+function createChart(){
+
+const ctx=document.getElementById("chart");
+
+chart=new Chart(ctx,{
+type:"pie",
+data:{
+labels:["Road","Waste","Electricity","Other"],
+datasets:[{
+data:[1,1,1,1],
+backgroundColor:[
+"#ef4444",
+"#22c55e",
+"#eab308",
+"#3b82f6"
+]
+}]
+}
+});
+
+}
+
+createChart();
+
+async function analyze(){
+
+let text=document.getElementById("input").value;
+
+if(!text){
+
+alert("Enter issue");
+
+return;
+
+}
+
+document.getElementById("loading")
+.innerText="Analyzing...";
+
+
+try{
+
+let response=await fetch(
+"http://127.0.0.1:5000/analyze",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+text:text
+})
+}
+);
+
+let data=await response.json();
+
+let result=data.result;
+
+document.getElementById("category")
+.innerText=result.category;
+
+document.getElementById("severity")
+.innerText=result.severity;
+
+document.getElementById("department")
+.innerText=result.department;
+
+document.getElementById("score")
+.innerText=result.priority_score;
+
+document.getElementById("action")
+.innerText=result.recommended_action;
+
+
+total++;
+
+if(result.severity=="High")
+high++;
+
+if(result.severity=="Medium")
+medium++;
+
+document.getElementById(
+"totalCount"
+).innerText=total;
+
+document.getElementById(
+"highCount"
+).innerText=high;
+
+document.getElementById(
+"mediumCount"
+).innerText=medium;
+
+
+document.getElementById(
+"loading"
+).innerText="";
+
+}catch(e){
+
+console.log(e);
+
+document.getElementById(
+"loading"
+).innerText=
+"Backend unavailable";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
