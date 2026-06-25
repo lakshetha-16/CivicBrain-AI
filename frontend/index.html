@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>CivicBrain AI Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+
+<script
+src="https://unpkg.com/leaflet/dist/leaflet.js">
+</script>
 
 <style>
 
@@ -49,101 +60,128 @@ width:100%;
 height:120px;
 padding:15px;
 margin-top:15px;
-border-radius:10px;
 border:none;
+border-radius:10px;
 font-size:16px;
 }
 
 input[type=file]{
-margin-top:15px;
+
 width:100%;
+margin-top:15px;
 padding:10px;
 background:white;
 border-radius:10px;
+color:black;
+
 }
 
 button{
-margin-top:15px;
+
 padding:12px 20px;
 border:none;
 border-radius:10px;
 cursor:pointer;
-color:white;
+margin-top:15px;
 margin-right:10px;
+color:white;
+
 }
 
 .analyzeBtn{
+
 background:#22c55e;
+
 }
 
 .locationBtn{
+
 background:#3b82f6;
+
 }
 
-img{
+#preview{
+
 margin-top:15px;
 width:100%;
 max-height:200px;
-border-radius:10px;
 display:none;
+border-radius:10px;
+
+}
+
+.locationBox{
+
+margin-top:15px;
+background:#334155;
+padding:15px;
+border-radius:10px;
+
+}
+
+#map{
+
+height:300px;
+margin-top:15px;
+border-radius:15px;
+
 }
 
 .reportCard{
+
 margin-top:20px;
 padding:20px;
 background:#020f2c;
 border-radius:15px;
 line-height:2;
+
 }
 
 .stats{
+
 display:flex;
 gap:15px;
 margin-bottom:20px;
+
 }
 
 .card{
+
 flex:1;
 background:#334155;
 padding:20px;
 border-radius:12px;
 text-align:center;
+
 }
 
 .card h1{
+
 font-size:40px;
-}
 
-.locationBox{
-margin-top:15px;
-background:#334155;
-padding:10px;
-border-radius:10px;
-}
-
-iframe{
-margin-top:15px;
-width:100%;
-height:300px;
-border:none;
-border-radius:15px;
 }
 
 canvas{
+
+margin-top:20px;
 background:white;
 padding:10px;
 border-radius:15px;
-margin-top:20px;
+
 }
 
 </style>
+
 </head>
 
 <body>
 
 <div class="header">
+
 🚀 CivicBrain AI — Smart City Command Dashboard
+
 </div>
+
 
 <div class="container">
 
@@ -153,8 +191,9 @@ margin-top:20px;
 
 <textarea
 id="input"
-placeholder="Describe issue">
-</textarea>
+placeholder="Describe issue..."
+></textarea>
+
 
 <input
 type="file"
@@ -165,19 +204,21 @@ onchange="previewImage(event)"
 
 <img id="preview">
 
-<br>
 
 <button
 class="locationBtn"
-onclick="getLocation()">
+onclick="getLocation()"
+>
 
 Use Current Location
 
 </button>
 
+
 <button
 class="analyzeBtn"
-onclick="analyze()">
+onclick="analyze()"
+>
 
 Analyze
 
@@ -187,75 +228,172 @@ Analyze
 <div class="locationBox">
 
 📌 Latitude:
+
 <span id="lat">
+
 -
+
 </span>
 
-<br>
+<br><br>
 
 📌 Longitude:
+
 <span id="lon">
+
 -
+
 </span>
 
 </div>
 
 
-<div id="mapContainer"></div>
+<div id="map"></div>
 
 
 <div class="reportCard">
 
-<h2>📌 Report</h2>
+<h2>
 
-<p><b>Category:</b>
-<span id="category">-</span></p>
+📌 Report
 
-<p><b>Severity:</b>
-<span id="severity">-</span></p>
+</h2>
 
-<p><b>Department:</b>
-<span id="department">-</span></p>
+<br>
 
-<p><b>Score:</b>
-<span id="score">-</span></p>
+<p>
 
-<p><b>Action:</b>
-<span id="action">-</span></p>
+<b>Category:</b>
+
+<span id="category">
+
+-
+
+</span>
+
+</p>
+
+
+<p>
+
+<b>Severity:</b>
+
+<span id="severity">
+
+-
+
+</span>
+
+</p>
+
+
+<p>
+
+<b>Department:</b>
+
+<span id="department">
+
+-
+
+</span>
+
+</p>
+
+
+<p>
+
+<b>Score:</b>
+
+<span id="score">
+
+-
+
+</span>
+
+</p>
+
+
+<p>
+
+<b>Action:</b>
+
+<span id="action">
+
+-
+
+</span>
+
+</p>
+
 
 </div>
 
 </div>
+
 
 
 <div class="panel">
 
-<h2>📊 City Analytics</h2>
+<h2>
+
+📊 City Analytics
+
+</h2>
+
 
 <div class="stats">
 
 <div class="card">
-<h1 id="totalCount">0</h1>
+
+<h1 id="totalCount">
+
+0
+
+</h1>
+
 <p>Total</p>
+
 </div>
 
+
 <div class="card">
-<h1 id="highCount">0</h1>
+
+<h1 id="highCount">
+
+0
+
+</h1>
+
 <p>High</p>
+
 </div>
+
 
 <div class="card">
-<h1 id="mediumCount">0</h1>
+
+<h1 id="mediumCount">
+
+0
+
+</h1>
+
 <p>Medium</p>
-</div>
 
 </div>
+
+
+</div>
+
 
 <canvas id="chart"></canvas>
 
-</div>
 
 </div>
+
+
+</div>
+
+
 
 <script>
 
@@ -266,24 +404,45 @@ let medium=0;
 let latitude="";
 let longitude="";
 
+let map;
+let marker;
+
+
 const chart=new Chart(
+
 document.getElementById(
-"chart"),
+
+"chart"
+
+),
+
 {
+
 type:"pie",
+
 data:{
+
 labels:[
+
 "Road",
 "Waste",
 "Electricity",
 "Other"
+
 ],
+
 datasets:[{
+
 data:[1,1,1,1]
+
 }]
+
 }
+
 }
+
 );
+
 
 
 function previewImage(e){
@@ -292,12 +451,17 @@ let file=e.target.files[0];
 
 if(!file)return;
 
+
 let reader=new FileReader();
 
 reader.onload=function(){
 
-let img=document.getElementById(
+let img=
+
+document.getElementById(
+
 "preview"
+
 );
 
 img.src=reader.result;
@@ -306,7 +470,7 @@ img.style.display="block";
 
 }
 
-reader.readAsDataURL(file)
+reader.readAsDataURL(file);
 
 }
 
@@ -326,23 +490,69 @@ position.coords.longitude;
 
 
 document.getElementById(
+
 "lat"
-).innerText=
-latitude;
+
+).innerText=latitude;
+
 
 document.getElementById(
+
 "lon"
-).innerText=
-longitude;
+
+).innerText=longitude;
 
 
-document.getElementById(
-"mapContainer"
-).innerHTML=
 
-`<iframe
-src="https://maps.google.com/maps?q=${latitude},${longitude}&z=15&output=embed">
-</iframe>`;
+if(map){
+
+map.remove();
+
+}
+
+
+map=L.map(
+
+'map'
+
+).setView(
+
+[latitude,longitude],
+
+15
+
+);
+
+
+L.tileLayer(
+
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+
+{
+
+maxZoom:19
+
+}
+
+).addTo(map);
+
+
+marker=L.marker(
+
+[latitude,longitude]
+
+)
+
+.addTo(map)
+
+.bindPopup(
+
+"Reported Issue Location"
+
+)
+
+.openPopup();
+
 
 }
 
@@ -355,103 +565,133 @@ src="https://maps.google.com/maps?q=${latitude},${longitude}&z=15&output=embed">
 async function analyze(){
 
 let text=
+
 document.getElementById(
+
 "input"
+
 ).value;
 
+
 let image=
+
 document.getElementById(
+
 "imageInput"
+
 ).files[0];
 
 
 const formData=
+
 new FormData();
 
+
 formData.append(
+
 "text",
+
 text+
 " Location:"+latitude+
 ","+longitude
+
 );
+
 
 if(image){
 
 formData.append(
+
 "image",
+
 image
+
 );
 
 }
+
 
 const response=
+
 await fetch(
+
 "http://127.0.0.1:5000/analyze",
+
 {
+
 method:"POST",
+
 body:formData
+
 }
+
 );
 
+
 const data=
+
 await response.json();
 
-let result=
-data.result;
+const result=data.result;
 
 
 document.getElementById(
+
 "category"
-).innerText=
-result.category;
+
+).innerText=result.category;
+
 
 document.getElementById(
+
 "severity"
-).innerText=
-result.severity;
+
+).innerText=result.severity;
+
 
 document.getElementById(
+
 "department"
-).innerText=
-result.department;
+
+).innerText=result.department;
+
 
 document.getElementById(
+
 "score"
-).innerText=
-result.priority_score;
+
+).innerText=result.priority_score;
+
 
 document.getElementById(
+
 "action"
-).innerText=
-result.recommended_action;
+
+).innerText=result.recommended_action;
 
 
 total++;
 
-if(
-result.severity=="High"
-)
+if(result.severity=="High")
 high++;
 
-if(
-result.severity=="Medium"
-)
+if(result.severity=="Medium")
 medium++;
+
 
 document.getElementById(
 "totalCount"
-).innerText=
-total;
+).innerText=total;
+
 
 document.getElementById(
 "highCount"
-).innerText=
-high;
+).innerText=high;
+
 
 document.getElementById(
 "mediumCount"
-).innerText=
-medium;
+).innerText=medium;
 
 }
 
