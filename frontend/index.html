@@ -46,12 +46,21 @@ border-radius:15px;
 
 textarea{
 width:100%;
-height:160px;
+height:120px;
 padding:15px;
 border-radius:10px;
 border:none;
 font-size:16px;
 margin-top:15px;
+}
+
+input[type=file]{
+margin-top:15px;
+width:100%;
+padding:10px;
+background:white;
+border-radius:10px;
+color:black;
 }
 
 button{
@@ -65,12 +74,7 @@ font-size:16px;
 cursor:pointer;
 }
 
-button:hover{
-opacity:.9;
-}
-
 .reportCard{
-
 margin-top:20px;
 padding:20px;
 background:#020f2c;
@@ -94,21 +98,22 @@ text-align:center;
 
 .card h1{
 font-size:40px;
-margin-bottom:10px;
+}
+
+img{
+margin-top:15px;
+width:100%;
+max-height:200px;
+object-fit:cover;
+border-radius:10px;
+display:none;
 }
 
 canvas{
-margin-top:20px;
 background:white;
 padding:10px;
 border-radius:15px;
-}
-
-.loading{
-
-margin-top:15px;
-color:#22c55e;
-
+margin-top:20px;
 }
 
 </style>
@@ -128,19 +133,25 @@ color:#22c55e;
 
 <textarea
 id="input"
-placeholder="Describe civic issue..."></textarea>
+placeholder="Describe issue">
+</textarea>
+
+<input
+type="file"
+id="imageInput"
+accept="image/*"
+onchange="previewImage(event)"
+>
+
+<img id="preview">
 
 <button onclick="analyze()">
 Analyze
 </button>
 
-<div class="loading" id="loading"></div>
-
 <div class="reportCard">
 
 <h2>📌 Report</h2>
-
-<br>
 
 <p><b>Category:</b>
 <span id="category">-</span></p>
@@ -160,6 +171,7 @@ Analyze
 </div>
 
 </div>
+
 
 <div class="panel">
 
@@ -196,118 +208,152 @@ let total=0;
 let high=0;
 let medium=0;
 
-let chart;
-
-function createChart(){
-
-const ctx=document.getElementById("chart");
-
-chart=new Chart(ctx,{
+const chart=new Chart(
+document.getElementById(
+"chart"
+),
+{
 type:"pie",
 data:{
-labels:["Road","Waste","Electricity","Other"],
+labels:[
+"Road",
+"Waste",
+"Electricity",
+"Other"
+],
 datasets:[{
-data:[1,1,1,1],
-backgroundColor:[
-"#ef4444",
-"#22c55e",
-"#eab308",
-"#3b82f6"
-]
+data:[1,1,1,1]
 }]
 }
-});
-
-}
-
-createChart();
-
-async function analyze(){
-
-let text=document.getElementById("input").value;
-
-if(!text){
-
-alert("Enter issue");
-
-return;
-
-}
-
-document.getElementById("loading")
-.innerText="Analyzing...";
-
-
-try{
-
-let response=await fetch(
-"http://127.0.0.1:5000/analyze",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-text:text
-})
 }
 );
 
-let data=await response.json();
 
-let result=data.result;
+function previewImage(e){
 
-document.getElementById("category")
-.innerText=result.category;
+let file=e.target.files[0];
 
-document.getElementById("severity")
-.innerText=result.severity;
+if(!file)return;
 
-document.getElementById("department")
-.innerText=result.department;
+let reader=new FileReader();
 
-document.getElementById("score")
-.innerText=result.priority_score;
+reader.onload=function(){
 
-document.getElementById("action")
-.innerText=result.recommended_action;
+let img=
+document.getElementById(
+"preview"
+);
+
+img.src=reader.result;
+
+img.style.display="block";
+
+}
+
+reader.readAsDataURL(
+file
+);
+
+}
+
+
+async function analyze(){
+
+let text=
+document.getElementById(
+"input"
+).value;
+
+let image=
+document.getElementById(
+"imageInput"
+).files[0];
+
+const formData=
+new FormData();
+
+formData.append(
+"text",
+text
+);
+
+if(image){
+
+formData.append(
+"image",
+image
+);
+
+}
+
+const response=
+await fetch(
+"http://127.0.0.1:5000/analyze",
+{
+method:"POST",
+body:formData
+}
+);
+
+const data=
+await response.json();
+
+let result=
+data.result;
+
+
+document.getElementById(
+"category"
+).innerText=
+result.category;
+
+document.getElementById(
+"severity"
+).innerText=
+result.severity;
+
+document.getElementById(
+"department"
+).innerText=
+result.department;
+
+document.getElementById(
+"score"
+).innerText=
+result.priority_score;
+
+document.getElementById(
+"action"
+).innerText=
+result.recommended_action;
 
 
 total++;
 
-if(result.severity=="High")
+if(
+result.severity=="High"
+)
 high++;
 
-if(result.severity=="Medium")
+if(
+result.severity=="Medium"
+)
 medium++;
 
 document.getElementById(
 "totalCount"
-).innerText=total;
+).innerText=
+total;
 
 document.getElementById(
 "highCount"
-).innerText=high;
+).innerText=
+high;
 
 document.getElementById(
 "mediumCount"
-).innerText=medium;
-
-
-document.getElementById(
-"loading"
-).innerText="";
-
-}catch(e){
-
-console.log(e);
-
-document.getElementById(
-"loading"
 ).innerText=
-"Backend unavailable";
-
-}
+medium;
 
 }
 
