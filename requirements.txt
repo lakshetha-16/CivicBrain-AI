@@ -2,6 +2,7 @@ flask
 gunicorn
 google-generativeai
 flask-cors
+python-dotenv
 requests
 numpy
 pandas
