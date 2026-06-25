@@ -19,8 +19,8 @@ font-family:Arial,sans-serif;
 body{
 background:#0f172a;
 color:white;
-min-height:100vh;
 padding:20px;
+min-height:100vh;
 }
 
 .header{
@@ -48,10 +48,10 @@ textarea{
 width:100%;
 height:120px;
 padding:15px;
+margin-top:15px;
 border-radius:10px;
 border:none;
 font-size:16px;
-margin-top:15px;
 }
 
 input[type=file]{
@@ -60,18 +60,32 @@ width:100%;
 padding:10px;
 background:white;
 border-radius:10px;
-color:black;
 }
 
 button{
 margin-top:15px;
-padding:12px 25px;
-background:#22c55e;
+padding:12px 20px;
 border:none;
 border-radius:10px;
-color:white;
-font-size:16px;
 cursor:pointer;
+color:white;
+margin-right:10px;
+}
+
+.analyzeBtn{
+background:#22c55e;
+}
+
+.locationBtn{
+background:#3b82f6;
+}
+
+img{
+margin-top:15px;
+width:100%;
+max-height:200px;
+border-radius:10px;
+display:none;
 }
 
 .reportCard{
@@ -100,13 +114,19 @@ text-align:center;
 font-size:40px;
 }
 
-img{
+.locationBox{
+margin-top:15px;
+background:#334155;
+padding:10px;
+border-radius:10px;
+}
+
+iframe{
 margin-top:15px;
 width:100%;
-max-height:200px;
-object-fit:cover;
-border-radius:10px;
-display:none;
+height:300px;
+border:none;
+border-radius:15px;
 }
 
 canvas{
@@ -145,9 +165,44 @@ onchange="previewImage(event)"
 
 <img id="preview">
 
-<button onclick="analyze()">
-Analyze
+<br>
+
+<button
+class="locationBtn"
+onclick="getLocation()">
+
+Use Current Location
+
 </button>
+
+<button
+class="analyzeBtn"
+onclick="analyze()">
+
+Analyze
+
+</button>
+
+
+<div class="locationBox">
+
+📌 Latitude:
+<span id="lat">
+-
+</span>
+
+<br>
+
+📌 Longitude:
+<span id="lon">
+-
+</span>
+
+</div>
+
+
+<div id="mapContainer"></div>
+
 
 <div class="reportCard">
 
@@ -208,10 +263,12 @@ let total=0;
 let high=0;
 let medium=0;
 
+let latitude="";
+let longitude="";
+
 const chart=new Chart(
 document.getElementById(
-"chart"
-),
+"chart"),
 {
 type:"pie",
 data:{
@@ -239,8 +296,7 @@ let reader=new FileReader();
 
 reader.onload=function(){
 
-let img=
-document.getElementById(
+let img=document.getElementById(
 "preview"
 );
 
@@ -250,11 +306,50 @@ img.style.display="block";
 
 }
 
-reader.readAsDataURL(
-file
-);
+reader.readAsDataURL(file)
 
 }
+
+
+
+function getLocation(){
+
+navigator.geolocation.getCurrentPosition(
+
+function(position){
+
+latitude=
+position.coords.latitude;
+
+longitude=
+position.coords.longitude;
+
+
+document.getElementById(
+"lat"
+).innerText=
+latitude;
+
+document.getElementById(
+"lon"
+).innerText=
+longitude;
+
+
+document.getElementById(
+"mapContainer"
+).innerHTML=
+
+`<iframe
+src="https://maps.google.com/maps?q=${latitude},${longitude}&z=15&output=embed">
+</iframe>`;
+
+}
+
+)
+
+}
+
 
 
 async function analyze(){
@@ -269,12 +364,15 @@ document.getElementById(
 "imageInput"
 ).files[0];
 
+
 const formData=
 new FormData();
 
 formData.append(
 "text",
-text
+text+
+" Location:"+latitude+
+","+longitude
 );
 
 if(image){
