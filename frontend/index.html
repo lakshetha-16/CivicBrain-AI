@@ -66,18 +66,15 @@ font-size:16px;
 }
 
 input[type=file]{
-
 width:100%;
 margin-top:15px;
 padding:10px;
 background:white;
 border-radius:10px;
 color:black;
-
 }
 
 button{
-
 padding:12px 20px;
 border:none;
 border-radius:10px;
@@ -85,89 +82,89 @@ cursor:pointer;
 margin-top:15px;
 margin-right:10px;
 color:white;
-
 }
 
 .analyzeBtn{
-
 background:#22c55e;
-
 }
 
 .locationBtn{
-
 background:#3b82f6;
-
 }
 
 #preview{
-
 margin-top:15px;
 width:100%;
 max-height:200px;
 display:none;
 border-radius:10px;
-
 }
 
 .locationBox{
-
 margin-top:15px;
 background:#334155;
 padding:15px;
 border-radius:10px;
-
 }
 
 #map{
-
 height:300px;
 margin-top:15px;
 border-radius:15px;
-
 }
 
 .reportCard{
-
 margin-top:20px;
 padding:20px;
 background:#020f2c;
 border-radius:15px;
 line-height:2;
-
 }
 
 .stats{
-
 display:flex;
 gap:15px;
 margin-bottom:20px;
-
 }
 
 .card{
-
 flex:1;
 background:#334155;
 padding:20px;
 border-radius:12px;
 text-align:center;
-
 }
 
 .card h1{
-
 font-size:40px;
-
 }
 
 canvas{
-
 margin-top:20px;
 background:white;
 padding:10px;
 border-radius:15px;
+}
 
+/* NEW TIMELINE */
+
+.timeline{
+margin-top:20px;
+padding:20px;
+background:#020f2c;
+border-radius:15px;
+}
+
+.step{
+padding:12px;
+margin-top:10px;
+background:#334155;
+border-radius:10px;
+transition:0.5s;
+}
+
+.active{
+background:#22c55e;
 }
 
 </style>
@@ -177,11 +174,8 @@ border-radius:15px;
 <body>
 
 <div class="header">
-
 🚀 CivicBrain AI — Smart City Command Dashboard
-
 </div>
-
 
 <div class="container">
 
@@ -194,7 +188,6 @@ id="input"
 placeholder="Describe issue..."
 ></textarea>
 
-
 <input
 type="file"
 id="imageInput"
@@ -204,196 +197,119 @@ onchange="previewImage(event)"
 
 <img id="preview">
 
-
 <button
 class="locationBtn"
-onclick="getLocation()"
->
+onclick="getLocation()">
 
 Use Current Location
 
 </button>
 
-
 <button
 class="analyzeBtn"
-onclick="analyze()"
->
+onclick="analyze()">
 
 Analyze
 
 </button>
 
-
 <div class="locationBox">
 
 📌 Latitude:
-
-<span id="lat">
-
--
-
-</span>
+<span id="lat">-</span>
 
 <br><br>
 
 📌 Longitude:
-
-<span id="lon">
-
--
-
-</span>
+<span id="lon">-</span>
 
 </div>
-
 
 <div id="map"></div>
 
-
 <div class="reportCard">
 
-<h2>
-
-📌 Report
-
-</h2>
+<h2>📌 Report</h2>
 
 <br>
 
-<p>
+<p><b>Category:</b>
+<span id="category">-</span></p>
 
-<b>Category:</b>
+<p><b>Severity:</b>
+<span id="severity">-</span></p>
 
-<span id="category">
+<p><b>Department:</b>
+<span id="department">-</span></p>
 
--
+<p><b>Score:</b>
+<span id="score">-</span></p>
 
-</span>
+<p><b>Action:</b>
+<span id="action">-</span></p>
 
-</p>
-
-
-<p>
-
-<b>Severity:</b>
-
-<span id="severity">
-
--
-
-</span>
-
-</p>
+</div>
 
 
-<p>
+<!-- NEW SECTION -->
 
-<b>Department:</b>
+<div class="timeline">
 
-<span id="department">
+<h2>📍 Issue Tracking</h2>
 
--
+<div id="step1" class="step active">
+✅ Reported
+</div>
 
-</span>
+<div id="step2" class="step">
+🔍 Verified
+</div>
 
-</p>
+<div id="step3" class="step">
+🏢 Assigned
+</div>
 
+<div id="step4" class="step">
+🛠 In Progress
+</div>
 
-<p>
-
-<b>Score:</b>
-
-<span id="score">
-
--
-
-</span>
-
-</p>
-
-
-<p>
-
-<b>Action:</b>
-
-<span id="action">
-
--
-
-</span>
-
-</p>
-
-
+<div id="step5" class="step">
+🎉 Resolved
 </div>
 
 </div>
 
+</div>
 
 
 <div class="panel">
 
-<h2>
-
-📊 City Analytics
-
-</h2>
-
+<h2>📊 City Analytics</h2>
 
 <div class="stats">
 
 <div class="card">
-
-<h1 id="totalCount">
-
-0
-
-</h1>
-
+<h1 id="totalCount">0</h1>
 <p>Total</p>
-
 </div>
 
-
 <div class="card">
-
-<h1 id="highCount">
-
-0
-
-</h1>
-
+<h1 id="highCount">0</h1>
 <p>High</p>
-
 </div>
-
 
 <div class="card">
-
-<h1 id="mediumCount">
-
-0
-
-</h1>
-
+<h1 id="mediumCount">0</h1>
 <p>Medium</p>
-
 </div>
 
-
 </div>
-
 
 <canvas id="chart"></canvas>
 
-
 </div>
 
-
 </div>
-
-
 
 <script>
 
@@ -407,43 +323,23 @@ let longitude="";
 let map;
 let marker;
 
-
 const chart=new Chart(
-
-document.getElementById(
-
-"chart"
-
-),
-
+document.getElementById("chart"),
 {
-
 type:"pie",
-
 data:{
-
 labels:[
-
 "Road",
 "Waste",
 "Electricity",
 "Other"
-
 ],
-
 datasets:[{
-
 data:[1,1,1,1]
-
 }]
-
 }
-
 }
-
 );
-
-
 
 function previewImage(e){
 
@@ -451,21 +347,13 @@ let file=e.target.files[0];
 
 if(!file)return;
 
-
 let reader=new FileReader();
 
 reader.onload=function(){
 
-let img=
-
-document.getElementById(
-
-"preview"
-
-);
+let img=document.getElementById("preview");
 
 img.src=reader.result;
-
 img.style.display="block";
 
 }
@@ -474,201 +362,120 @@ reader.readAsDataURL(file);
 
 }
 
-
-
 function getLocation(){
 
 navigator.geolocation.getCurrentPosition(
 
 function(position){
 
-latitude=
-position.coords.latitude;
+latitude=position.coords.latitude;
+longitude=position.coords.longitude;
 
-longitude=
-position.coords.longitude;
-
-
-document.getElementById(
-
-"lat"
-
-).innerText=latitude;
-
-
-document.getElementById(
-
-"lon"
-
-).innerText=longitude;
-
-
+document.getElementById("lat").innerText=latitude;
+document.getElementById("lon").innerText=longitude;
 
 if(map){
-
 map.remove();
-
 }
 
-
-map=L.map(
-
-'map'
-
-).setView(
-
+map=L.map('map').setView(
 [latitude,longitude],
-
 15
-
 );
 
-
 L.tileLayer(
-
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-{
-
-maxZoom:19
-
-}
-
+{maxZoom:19}
 ).addTo(map);
 
-
 marker=L.marker(
-
 [latitude,longitude]
-
 )
-
 .addTo(map)
-
 .bindPopup(
-
 "Reported Issue Location"
-
 )
-
 .openPopup();
 
-
 }
 
 )
 
 }
 
+function updateTimeline(){
 
+document.querySelectorAll(
+".step"
+).forEach(
+x=>x.classList.remove("active")
+)
+
+document.getElementById("step1").classList.add("active")
+
+setTimeout(()=>{
+document.getElementById("step2").classList.add("active")
+},1000)
+
+setTimeout(()=>{
+document.getElementById("step3").classList.add("active")
+},2000)
+
+setTimeout(()=>{
+document.getElementById("step4").classList.add("active")
+},3000)
+
+setTimeout(()=>{
+document.getElementById("step5").classList.add("active")
+},4000)
+
+}
 
 async function analyze(){
 
 let text=
-
-document.getElementById(
-
-"input"
-
-).value;
-
+document.getElementById("input").value;
 
 let image=
-
-document.getElementById(
-
-"imageInput"
-
-).files[0];
-
+document.getElementById("imageInput").files[0];
 
 const formData=
-
 new FormData();
 
-
 formData.append(
-
 "text",
-
-text+
-" Location:"+latitude+
-","+longitude
-
+text+" Location:"+latitude+","+longitude
 );
-
 
 if(image){
 
 formData.append(
-
 "image",
-
 image
-
 );
 
 }
-
 
 const response=
-
 await fetch(
-
 "http://127.0.0.1:5000/analyze",
-
 {
-
 method:"POST",
-
 body:formData
-
 }
-
 );
 
-
-const data=
-
-await response.json();
+const data=await response.json();
 
 const result=data.result;
 
+document.getElementById("category").innerText=result.category;
+document.getElementById("severity").innerText=result.severity;
+document.getElementById("department").innerText=result.department;
+document.getElementById("score").innerText=result.priority_score;
+document.getElementById("action").innerText=result.recommended_action;
 
-document.getElementById(
-
-"category"
-
-).innerText=result.category;
-
-
-document.getElementById(
-
-"severity"
-
-).innerText=result.severity;
-
-
-document.getElementById(
-
-"department"
-
-).innerText=result.department;
-
-
-document.getElementById(
-
-"score"
-
-).innerText=result.priority_score;
-
-
-document.getElementById(
-
-"action"
-
-).innerText=result.recommended_action;
-
+updateTimeline();
 
 total++;
 
@@ -678,20 +485,9 @@ high++;
 if(result.severity=="Medium")
 medium++;
 
-
-document.getElementById(
-"totalCount"
-).innerText=total;
-
-
-document.getElementById(
-"highCount"
-).innerText=high;
-
-
-document.getElementById(
-"mediumCount"
-).innerText=medium;
+document.getElementById("totalCount").innerText=total;
+document.getElementById("highCount").innerText=high;
+document.getElementById("mediumCount").innerText=medium;
 
 }
 
